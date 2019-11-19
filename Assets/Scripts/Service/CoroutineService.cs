@@ -1,1 +1,0 @@
-﻿class CoroutineService : Singleton<CoroutineService> { }
