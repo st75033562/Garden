@@ -1,0 +1,42 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class ListVariableItemBlock : VariableBaseListBlock
+{
+    ListMenuPlugins m_Menu;
+
+    protected override void Start()
+    {
+        base.Start();
+        m_Menu = gameObject.GetComponentInChildren<ListMenuPlugins>(!NodeTemplateCache.Instance.ShowBlockUI);
+    }
+
+    public override IEnumerator GetNodeReturnValue(ThreadContext context, ValueWrapper<string> retValue)
+    {
+        var listData = CodeContext.variableManager.get<ListData>(m_Menu.GetMenuValue());
+        if (listData != null)
+        {
+            var slotValues = new List<string>();
+            yield return Node.GetSlotValues(context, slotValues);
+            int pos;
+            if ("down_menu_last".Equals(slotValues[0]))
+            {
+                pos = listData.size();
+            }
+            else if ("down_menu_random".Equals(slotValues[0]))
+            {
+                pos = Random.Range(1, listData.size() + 1);
+            }
+            else
+            {
+                int.TryParse(slotValues[0], out pos);
+            }
+            retValue.value = listData[pos];
+        }
+        else
+        {
+            retValue.value = "";
+        }
+    }
+}
